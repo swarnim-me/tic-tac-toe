@@ -1,4 +1,33 @@
+.game-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    gap: 48px;
+}
+
+.score-board {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    font-size: 1.5rem;
+}
+
 .player-score-wrapper {
     text-align: center;
+}
+
+.game-board {
     display: flex;
+    flex-wrap: wrap;
+    width: min(90%, 400px);
+    aspect-ratio: 1 / 1;
+    box-shadow: -8px 0 0 0 black,
+        8px 0 0 0 black,
+        0 -8px 0 0 black,
+        0 8px 0 0 black;
+}
+
+.result {
+    font-size: 2rem;
 }

@@ -130,10 +130,11 @@ const displayController = (function () {
     const player1Image = document.querySelector(".player1 .player-img");
     const player2Image = document.querySelector(".player2 .player-img");
     const startGameBtn = document.querySelector(".play-btn");
-
+    const gameBoard = document.querySelector(".game-board");
     const init = () => {
         startGameController();
         playerTypeController();
+        createBoard();
     }
 
     const startGameController = () => {
@@ -152,6 +153,18 @@ const displayController = (function () {
     const createPlayers = () => {
         game.initPlayers(player1Bot, player2Bot)
         gameLoop();
+    }
+
+    const createBoard = () => {
+        for (let i = 0; i < 9; i++) {
+            const cell = document.createElement("div");
+            cell.classList.add("cell");
+            cell.style.height = "33.33%";
+            cell.style.width = "33.33%";
+            cell.style.border = "6px solid black";
+            cell.setAttribute("data-index", i);
+            gameBoard.appendChild(cell);
+        }
     }
 
     const playerTypeController = () => {
