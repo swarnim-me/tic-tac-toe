@@ -34,8 +34,7 @@ main {
 }
 
 .menu-screen {
-    display: none;
-    /* display: grid; */
+    display: grid;
     gap: 48px;
 }
 

@@ -123,14 +123,26 @@ const displayController = (function () {
     const game = GameController;
     let player1Bot = false;
     let player2Bot = true;
+
+    // Player Selection
     const player1Arrows = Array.from(document.querySelectorAll(".player1 .arrow"));
     const player2Arrows = Array.from(document.querySelectorAll(".player2 .arrow"));
     const player1Title = document.querySelector(".player1 .player-type");
     const player2Title = document.querySelector(".player2 .player-type");
     const player1Image = document.querySelector(".player1 .player-img");
     const player2Image = document.querySelector(".player2 .player-img");
+
+    // Screens
+    const menuScreen = document.querySelector(".menu-screen");
+    const gameScreen = document.querySelector(".game-screen");
+
+    // Buttons
     const startGameBtn = document.querySelector(".play-btn");
+
+    // Game Board
     const gameBoard = document.querySelector(".game-board");
+
+
     const init = () => {
         startGameController();
         playerTypeController();
@@ -142,28 +154,44 @@ const displayController = (function () {
             const player1 = player1Bot ? "Bot" : "Human";
             const player2 = player2Bot ? "Bot" : "Human";
             createPlayers();
+            menuScreen.style.display = "none";
+            gameScreen.style.display = "grid";
         })
     }
 
     const renderGame = () => {
         const activeBoard = game.getActiveBoard();
-        // Get Board
     }
 
     const createPlayers = () => {
         game.initPlayers(player1Bot, player2Bot)
-        gameLoop();
     }
 
     const createBoard = () => {
         for (let i = 0; i < 9; i++) {
             const cell = document.createElement("div");
             cell.classList.add("cell");
-            cell.style.height = "33.33%";
-            cell.style.width = "33.33%";
-            cell.style.border = "6px solid black";
             cell.setAttribute("data-index", i);
+            cell.addEventListener("click", cellListener);
             gameBoard.appendChild(cell);
+        }
+    }
+
+    const endRound = () => {
+        const cells = Array.from(gameBoard.children);
+        console.log(cells);
+        cells.forEach(cell => cell.removeEventListener("click", cellListener));
+    }
+
+    const cellListener = (event) => {
+        const activePlayer = game.getActivePlayer();
+        const roundResult = game.playRound(event.target.dataset.index);
+        if (!roundResult.error) {
+            const symbol = activePlayer.getPlayerSymbol() === 1 ? "x" : "o";
+            event.target.textContent = symbol;
+            if (roundResult.result) {
+                roundEnd();
+            }
         }
     }
 
@@ -216,26 +244,5 @@ const displayController = (function () {
         })
     }
 
-
-
-    const gameLoop = () => {
-        console.log("Game Started");
-        // while (true) {
-        //     const input = prompt("Input Please");
-        //     const roundResult = game.playRound(input);
-        //     if (roundResult.error) console.log("The cell is already occupied");
-        //     renderGame();
-        //     if (roundResult.result) {
-        //         if (roundResult.isWinner) {
-        //             console.log("The winner is " + game.getActivePlayer().getUsername());
-        //         }
-        //         else {
-        //             console.log("It is a draw");
-        //         }
-        //         game.getActivePlayer().addScore();
-        //         game.resetBoard();
-        //     }
-        // }
-    }
     init();
 })();
