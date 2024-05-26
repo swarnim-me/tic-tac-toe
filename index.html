@@ -5,11 +5,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic Tac Toe</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/game.css">
     <script src="./js/script.js" defer></script>
 </head>
 
 <body>
+    <main>
+        <h1 class="app-title">TIC TAC TOE</h1>
+        <div class="menu-screen">
+            <div class="selection-cards">
+                <div class="player-card player1">
+                    <div class="player-type-wrapper">
+                        <img src="./assets/icons/arrow.svg" alt="arrow" class="arrow arrow-left">
+                        <p class="player-type">Human</p>
+                        <img src="./assets/icons/arrow.svg" alt="arrow" class="arrow arrow-right">
+                    </div>
+                    <img src="./assets/images/player.png" alt="player" class="player-img">
+                    <div class="player-title">Player 1</div>
+                </div>
+                <p class="vs-title">VS</p>
+                <div class="player-card player2">
+                    <div class="player-type-wrapper">
+                        <img src="./assets/icons/arrow.svg" alt="arrow" class="arrow arrow-left">
+                        <p class="player-type">Bot</p>
+                        <img src="./assets/icons/arrow.svg" alt="arrow" class="arrow icon arrow-right">
+                    </div>
+                    <img src="./assets/images/bot.png" alt="player" class="player-img">
+                    <div class="player-title">Player 2</div>
+                </div>
+            </div>
+            <button class="play-btn">PLAY</button>
+        </div>
 
+        <div class="game-screen">
+            <div class="player-score-wrapper">
+                <p class="player-score-title">Player 1</p>
+                <p class="player1-score">0</p>
+            </div>
+            <div class="player-score-wrapper">
+                <p class="player-score-title">Player 2</p>
+                <p class="player2-score">0</p>
+            </div>
+            <div class="game-board"></div>
+            <div class="result"></div>
+        </div>
+    </main>
 </body>
 
 </html>

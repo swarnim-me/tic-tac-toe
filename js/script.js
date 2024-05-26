@@ -11,6 +11,8 @@ const GameBoard = (function () {
         }
     }
 
+    const getGameSymbols = () => symbols;
+
     const getBoard = () => board;
 
     const markBoard = (index, value) => {
@@ -18,11 +20,13 @@ const GameBoard = (function () {
         return checkWinner();
     }
 
+    const isCellAvailable = (cellIndex) => {
+        if (board[cellIndex] === -1) return true;
+        return false;
+    }
     const checkWinner = () => {
         const checkLine = (...args) => {
-            // console.log(args);
             // We don't need to compare empty values
-
             for (let i = 0; i < args.length; i++) {
                 if (board[args[i]] === symbols.empty) return { result: false, isWinner: false, cells: [] };
             }
@@ -60,58 +64,165 @@ const GameBoard = (function () {
         }
         return { result: false, isWinner: false, cells: [] };
     }
-    return { init, getBoard, markBoard, symbols }
+    return { init, getBoard, isCellAvailable, markBoard, getGameSymbols }
 })();
 
-const createPlayer = (username, symbol, isBot = false) => {
+const createPlayer = (isBot, symbol) => {
     const score = 0;
-    const getUsername = () => username;
+    const playerSymbol = symbol;
     const getScore = () => score;
     const addScore = () => score++;
     const isUserBot = () => isBot;
-    return { symbol, getUsername, getScore, addScore, isUserBot };
+    const getPlayerSymbol = () => playerSymbol;
+    const resetPlayerScore = () => score = 0;
+    return { getPlayerSymbol, getScore, addScore, isUserBot, resetPlayerScore };
 }
 
-const Renderer = (function () {
-    const symbols = GameBoard.symbols;
-    const printBoard = (board) => {
-        // for (let i = 0; i < 9; i += 3) {
-        //     for (let j = 0; j < 3; j++) {
-        //         switch (board[j + i]) {
-        //             case symbols.x: console.log('X'); break;
-        //             case symbols.y: console.log('Y'); break;
-        //             default: console.log(' ');
-        //         }
-        //     }
-        //     console.log('\n');
-        // }
-        console.log(JSON.stringify(board));
-    }
-    return { printBoard };
-})();
-
 const GameController = (function () {
-    GameBoard.init();
-    const symbols = GameBoard.symbols;
-    const player1 = createPlayer(prompt("Enter first player name"), symbols.x, false);
-    const player2 = createPlayer(prompt("Enter second player name"), symbols.o, false);
-    let currentPlayer = player1;
+    let player1;
+    let player2;
+    let currentPlayer;
+    const gameSymbols = GameBoard.getGameSymbols();
+    const initPlayers = (player1Input, player2Input) => {
+        GameBoard.init();
+        player1 = createPlayer(player1Input, gameSymbols.x);
+        player2 = createPlayer(player2Input, gameSymbols.o);
+        currentPlayer = player1;
+    }
     const switchPlayer = () => {
         currentPlayer = currentPlayer === player1 ? player2 : player1;
     }
-    while (true) {
-        let input = prompt(`${currentPlayer.getUsername()}'s turn`);
-        const { result, isWinner, cells } = GameBoard.markBoard(input, currentPlayer.symbol);
-        Renderer.printBoard(GameBoard.getBoard());
-        if (result) {
-            if (isWinner) {
-                console.log(`${currentPlayer.getUsername()} is the winner`);
+
+    const playRound = (input) => {
+        if (GameBoard.isCellAvailable(input)) {
+            const roundResult = GameBoard.markBoard(input, currentPlayer.getPlayerSymbol());
+            switchPlayer();
+            return roundResult;
+        }
+        return { error: true };
+    }
+
+    const resetBoard = () => {
+        GameBoard.init();
+    }
+
+    const resetGame = () => {
+        player1.resetPlayerScore();
+        player2.resetPlayerScore();
+        resetBoard();
+    }
+
+    const getPlayers = () => { player1, player2 };
+    const getActivePlayer = () => currentPlayer;
+
+    const getActiveBoard = () => GameBoard.getBoard();
+    return { initPlayers, playRound, getActiveBoard, getPlayers, getActivePlayer, resetBoard, resetGame };
+})();
+
+const displayController = (function () {
+    const game = GameController;
+    let player1Bot = false;
+    let player2Bot = true;
+    const player1Arrows = Array.from(document.querySelectorAll(".player1 .arrow"));
+    const player2Arrows = Array.from(document.querySelectorAll(".player2 .arrow"));
+    const player1Title = document.querySelector(".player1 .player-type");
+    const player2Title = document.querySelector(".player2 .player-type");
+    const player1Image = document.querySelector(".player1 .player-img");
+    const player2Image = document.querySelector(".player2 .player-img");
+    const startGameBtn = document.querySelector(".play-btn");
+
+    const init = () => {
+        startGameController();
+        playerTypeController();
+    }
+
+    const startGameController = () => {
+        startGameBtn.addEventListener("click", () => {
+            const player1 = player1Bot ? "Bot" : "Human";
+            const player2 = player2Bot ? "Bot" : "Human";
+            createPlayers();
+        })
+    }
+
+    const renderGame = () => {
+        const activeBoard = game.getActiveBoard();
+        // Get Board
+    }
+
+    const createPlayers = () => {
+        game.initPlayers(player1Bot, player2Bot)
+        gameLoop();
+    }
+
+    const playerTypeController = () => {
+        const human = {
+            title: "Human",
+            imgSrc: "../assets/images/player.png"
+        }
+
+        const bot = {
+            title: "Bot",
+            imgSrc: "../assets/images/bot.png"
+        }
+
+        const flipValues = (playerBot, playerTitle, playerImage) => {
+            if (!playerBot) {
+                playerTitle.textContent = bot.title.toUpperCase();
+                playerImage.setAttribute("src", bot.imgSrc);
+                return true;
             }
             else {
-                console.log("It is a draw");
+                playerTitle.textContent = human.title.toUpperCase();
+                playerImage.setAttribute("src", human.imgSrc);
+                return false;
             }
-            break;
         }
-        switchPlayer();
+
+        player1Arrows.forEach(arrow => {
+            arrow.addEventListener("click", () => {
+                player1Bot = flipValues(player1Bot, player1Title, player1Image);
+                if (player1Bot) {
+                    player1Image.style.transform = "scaleX(-1)";
+                }
+                else {
+                    player1Image.style.transform = "scaleX(1)";
+                }
+            })
+        })
+
+        player2Arrows.forEach(arrow => {
+            arrow.addEventListener("click", () => {
+                player2Bot = flipValues(player2Bot, player2Title, player2Image);
+                if (!player2Bot) {
+                    player2Image.style.transform = "scaleX(-1)";
+                }
+                else {
+                    player2Image.style.transform = "scaleX(1)";
+                }
+            })
+        })
     }
+
+
+
+    const gameLoop = () => {
+        console.log("Game Started");
+        // while (true) {
+        //     const input = prompt("Input Please");
+        //     const roundResult = game.playRound(input);
+        //     if (roundResult.error) console.log("The cell is already occupied");
+        //     renderGame();
+        //     if (roundResult.result) {
+        //         if (roundResult.isWinner) {
+        //             console.log("The winner is " + game.getActivePlayer().getUsername());
+        //         }
+        //         else {
+        //             console.log("It is a draw");
+        //         }
+        //         game.getActivePlayer().addScore();
+        //         game.resetBoard();
+        //     }
+        // }
+    }
+    init();
 })();

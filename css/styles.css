@@ -1,0 +1,122 @@
+:root {
+    --primary-font-clr: #212121;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+@font-face {
+    font-family: 'Pixel';
+    src: url('../assets/fonts/ka1.ttf');
+}
+
+body {
+    min-height: 100vh;
+    width: 100vw;
+    font-family: 'Pixel';
+    color: var(--primary-font-clr);
+    background: url("../assets/images/background.png") no-repeat center;
+    background-size: cover;
+}
+
+main {
+    margin: auto;
+    width: min(90%, 1000px);
+    padding-block: 20px;
+    display: grid;
+    min-height: 100vh;
+    grid-template-rows: auto 1fr;
+    gap: 64px;
+}
+
+.menu-screen {
+    display: none;
+    /* display: grid; */
+    gap: 48px;
+}
+
+.app-title {
+    font-size: max(48px, 5vw);
+    text-align: center;
+}
+
+.selection-cards {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.vs-title {
+    font-size: 3rem;
+    width: 200px;
+    text-align: center;
+}
+
+.player-card {
+    width: fit-content;
+    display: grid;
+    gap: 24px;
+}
+
+.arrow {
+    cursor: pointer;
+}
+
+
+.player-type-wrapper {
+    display: flex;
+    justify-content: space-around;
+    font-size: 1.4rem;
+    width: 100%;
+}
+
+.player-type {
+    width: 200px;
+    text-align: center;
+}
+
+.arrow-left {
+    transform: scale(-1);
+}
+
+.player-title {
+    font-size: 2rem;
+    text-align: center;
+}
+
+.play-btn {
+    width: fit-content;
+    font-size: 2rem;
+    /* padding: 20px 64px; */
+    width: 300px;
+    height: 80px;
+    justify-self: center;
+    align-self: center;
+    border: none;
+    background: white;
+    font-family: 'Pixel';
+    border-right: 8px solid gray;
+    border-bottom: 8px solid gray;
+    box-shadow: -8px 0 0 0 black,
+        8px 0 0 0 black,
+        0 -8px 0 0 black,
+        0 8px 0 0 black;
+    cursor: pointer;
+    outline: none;
+}
+
+.play-btn:hover {
+    background: rgb(236, 236, 236);
+}
+
+.play-btn:active {
+    background: white;
+    border: 0px;
+}
