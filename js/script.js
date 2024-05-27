@@ -307,12 +307,12 @@ const displayController = (function () {
     const playerTypeController = () => {
         const human = {
             title: "Human",
-            imgSrc: "../assets/images/player.png"
+            imgSrc: "./assets/images/player.png"
         }
 
         const bot = {
             title: "Bot",
-            imgSrc: "../assets/images/bot.png"
+            imgSrc: "./assets/images/bot.png"
         }
 
         const flipValues = (playerBot, playerTitle, playerImage) => {
