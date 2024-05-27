@@ -1,5 +1,7 @@
 .game-screen {
     display: none;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: 3fr 1fr;
     width: 100%;
     justify-self: center;
     align-items: center;
@@ -13,11 +15,34 @@
     font-size: 1.5rem;
 }
 
-.player-score-wrapper {
+.player1-score-wrapper,
+.player2-score-wrapper {
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.player-score-title {
+    padding-bottom: 20px;
+}
+
+
+.player1-score,
+.player2-score {
+    font-size: 3rem;
     text-align: center;
 }
 
+.player1-score-wrapper {
+    grid-column: 1 / 2;
+}
+
+.player2-score-wrapper {
+    grid-column: 3 / 4;
+}
+
 .game-board {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
     display: flex;
     flex-wrap: wrap;
     width: min(90%, 400px);
@@ -41,6 +66,28 @@
     background: rgb(202, 202, 202);
 }
 
-.result {
+.game-result {
     font-size: 2rem;
+    text-align: center;
+    grid-column: 1 / -1;
+}
+
+@media(max-width: 1024px) {
+    .game-screen {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto auto;
+    }
+
+    .player1-score-wrapper {
+        grid-column: 1 / 2;
+    }
+
+    .player2-score-wrapper {
+        grid-column: 2 / 3;
+    }
+
+    .game-board {
+        grid-column: 1 / -1;
+        grid-row: 2 / 3;
+    }
 }

@@ -67,15 +67,17 @@ const GameBoard = (function () {
     return { init, getBoard, isCellAvailable, markBoard, getGameSymbols }
 })();
 
-const createPlayer = (isBot, symbol) => {
-    const score = 0;
+const createPlayer = (playerName, isBot, symbol) => {
+    const username = playerName;
+    let score = 0;
     const playerSymbol = symbol;
     const getScore = () => score;
+    const getUsername = () => username;
     const addScore = () => score++;
     const isUserBot = () => isBot;
     const getPlayerSymbol = () => playerSymbol;
     const resetPlayerScore = () => score = 0;
-    return { getPlayerSymbol, getScore, addScore, isUserBot, resetPlayerScore };
+    return { getUsername, getPlayerSymbol, getScore, addScore, isUserBot, resetPlayerScore };
 }
 
 const GameController = (function () {
@@ -85,12 +87,21 @@ const GameController = (function () {
     const gameSymbols = GameBoard.getGameSymbols();
     const initPlayers = (player1Input, player2Input) => {
         GameBoard.init();
-        player1 = createPlayer(player1Input, gameSymbols.x);
-        player2 = createPlayer(player2Input, gameSymbols.o);
+        player1 = createPlayer("Player 1", player1Input, gameSymbols.x);
+        player2 = createPlayer("Player 2", player2Input, gameSymbols.o);
         currentPlayer = player1;
     }
+
     const switchPlayer = () => {
         currentPlayer = currentPlayer === player1 ? player2 : player1;
+    }
+
+    const getBotResponse = () => {
+        let index = Math.floor(Math.random() * 10);
+        while (!GameBoard.isCellAvailable(index)) {
+            index = Math.floor(Math.random() * 10);
+        }
+        return index;
     }
 
     const playRound = (input) => {
@@ -103,6 +114,7 @@ const GameController = (function () {
     }
 
     const resetBoard = () => {
+        currentPlayer = player1;
         GameBoard.init();
     }
 
@@ -112,11 +124,11 @@ const GameController = (function () {
         resetBoard();
     }
 
-    const getPlayers = () => { player1, player2 };
+    const getPlayers = () => ({ player1, player2 });
     const getActivePlayer = () => currentPlayer;
 
     const getActiveBoard = () => GameBoard.getBoard();
-    return { initPlayers, playRound, getActiveBoard, getPlayers, getActivePlayer, resetBoard, resetGame };
+    return { initPlayers, playRound, getActiveBoard, getPlayers, getActivePlayer, getBotResponse, resetBoard, resetGame };
 })();
 
 const displayController = (function () {
@@ -136,43 +148,46 @@ const displayController = (function () {
     const menuScreen = document.querySelector(".menu-screen");
     const gameScreen = document.querySelector(".game-screen");
 
+    // Game Screen
+    const gameResult = document.querySelector(".game-result");
+    const player1Score = document.querySelector(".player1-score");
+    const player2Score = document.querySelector(".player2-score");
+
     // Buttons
-    const startGameBtn = document.querySelector(".play-btn");
+    const startGameBtn = document.querySelector(".menu-screen .play-btn");
 
     // Game Board
     const gameBoard = document.querySelector(".game-board");
 
 
     const init = () => {
-        startGameController();
         playerTypeController();
-        createBoard();
+        startGameController();
     }
 
     const startGameController = () => {
         startGameBtn.addEventListener("click", () => {
-            const player1 = player1Bot ? "Bot" : "Human";
-            const player2 = player2Bot ? "Bot" : "Human";
             createPlayers();
             menuScreen.style.display = "none";
             gameScreen.style.display = "grid";
+            createBoard();
+            startGame();
         })
     }
 
-    const renderGame = () => {
-        const activeBoard = game.getActiveBoard();
-    }
+
 
     const createPlayers = () => {
         game.initPlayers(player1Bot, player2Bot)
     }
 
     const createBoard = () => {
+        gameBoard.innerHTML = "";
         for (let i = 0; i < 9; i++) {
             const cell = document.createElement("div");
             cell.classList.add("cell");
             cell.setAttribute("data-index", i);
-            cell.addEventListener("click", cellListener);
+            // cell.addEventListener("click", cellListener);
             gameBoard.appendChild(cell);
         }
     }
@@ -183,14 +198,108 @@ const displayController = (function () {
         cells.forEach(cell => cell.removeEventListener("click", cellListener));
     }
 
+    const updateScore = () => {
+        console.log(game.getPlayers());
+        player1Score.textContent = game.getPlayers().player1.getScore();
+        player2Score.textContent = game.getPlayers().player2.getScore();
+    }
+
+    const paintWinner = (indexes) => {
+        const cells = gameBoard.children;
+        indexes.forEach(index => {
+            cells[index].style.background = "black";
+            cells[index].style.color = "white";
+        })
+    }
+
+    const restartRound = () => {
+        game.resetBoard();
+        createBoard();
+        gameResult.textContent = "Start Game";
+        gameResult.removeEventListener("click", restartRound);
+        startGame();
+    }
+
+    const restartGame = () => {
+        menuScreen.style.display = "grid";
+        gameScreen.style.display = "none";
+        game.resetGame();
+        gameResult.textContent = "Start Game";
+        gameResult.removeEventListener("click", restartGame);
+        createBoard();
+        updateScore();
+    }
+
+    const addCellListeners = () => {
+        const cells = Array.from(gameBoard.children);
+        cells.forEach(cell => {
+            cell.addEventListener("click", cellListener);
+        })
+    }
+
+    const removeCellListeners = () => {
+        const cells = Array.from(gameBoard.children);
+        cells.forEach(cell => {
+            cell.removeEventListener("click", cellListener);
+        })
+    }
+
     const cellListener = (event) => {
+        // const symbol = game.getActivePlayer().getSymbol() === 1 ? "x" : "o";
+        // event.target.textContent = symbol;
+        playRound(event.target.dataset.index);
+    }
+
+    function timeout(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    async function sleep(fn, ...args) {
+        await timeout(800);
+        return fn(...args);
+    }
+
+    const playBotTurn = async () => {
+        const response = await sleep(playRound, game.getBotResponse());
+        return response;
+    }
+
+    const startGame = () => {
         const activePlayer = game.getActivePlayer();
-        const roundResult = game.playRound(event.target.dataset.index);
+        if (activePlayer.isUserBot()) {
+            removeCellListeners();
+            playBotTurn();
+        }
+        else {
+            addCellListeners();
+        }
+    }
+
+    const playRound = (index) => {
+        const activePlayer = game.getActivePlayer();
+        const roundResult = game.playRound(index);
         if (!roundResult.error) {
-            const symbol = activePlayer.getPlayerSymbol() === 1 ? "x" : "o";
-            event.target.textContent = symbol;
+            gameBoard.children[index].textContent = activePlayer.getPlayerSymbol() === 1 ? "x" : "o";
             if (roundResult.result) {
-                endRound();
+                if (roundResult.isWinner) {
+                    paintWinner(roundResult.cells);
+                    activePlayer.addScore();
+                    updateScore();
+                    if (activePlayer.getScore() === 3) {
+                        gameResult.textContent = `${activePlayer.getUsername()} wins! Restart Game?}`;
+                        gameResult.addEventListener("click", restartGame);
+                    }
+                    else {
+                        gameResult.textContent = `${activePlayer.getUsername()} wins the round. Play Again?`;
+                        gameResult.addEventListener("click", restartRound);
+                    }
+                }
+                else {
+                    gameResult.textContent = `Draw`;
+                    gameResult.addEventListener("click", restartRound);
+                }
+            }
+            else {
+                startGame();
             }
         }
     }
@@ -243,6 +352,5 @@ const displayController = (function () {
             })
         })
     }
-
     init();
 })();

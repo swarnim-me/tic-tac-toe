@@ -30,7 +30,7 @@ main {
     display: grid;
     min-height: 100vh;
     grid-template-rows: auto 1fr;
-    gap: 64px;
+    gap: 40px;
 }
 
 .menu-screen {
@@ -50,6 +50,7 @@ main {
     align-items: center;
     gap: 24px;
     flex-wrap: wrap;
+    padding-top: 24px;
 }
 
 .vs-title {
