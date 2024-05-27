@@ -110,6 +110,7 @@ main {
         0 8px 0 0 black;
     cursor: pointer;
     outline: none;
+    color: var(--primary-font-clr);
 }
 
 .play-btn:hover {
