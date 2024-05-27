@@ -190,7 +190,7 @@ const displayController = (function () {
             const symbol = activePlayer.getPlayerSymbol() === 1 ? "x" : "o";
             event.target.textContent = symbol;
             if (roundResult.result) {
-                roundEnd();
+                endRound();
             }
         }
     }
